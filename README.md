@@ -109,3 +109,8 @@ Blockchain is made of transactions, they are like records. All the transactions 
 pip3 install web3
 pip3 install rich
 ```
+
+### Documentation Links
+
+[web3](https://web3py.readthedocs.io/)
+[rich](https://rich.readthedocs.io/)
