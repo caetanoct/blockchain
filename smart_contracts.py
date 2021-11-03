@@ -1,6 +1,8 @@
 import json
 from web3 import Web3
-import pprint
+from modules.parse import attributedict_to_json
+from rich import print_json
+from rich import print
 ganache_url = "http://127.0.0.1:8545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
 contracts_list = []
@@ -15,7 +17,7 @@ def print_contract_abi_names(contract):
 				print(f'{name} - Does not take Input')			
 def print_contract_abi(contract):	
 	print('--- Contract ABI ---')
-	pprint.pprint(contract.abi)
+	print_json(data=contract.abi)
 def print_contract_list():
 	print('--- Contract List (index - address) ---')
 	for i,contract in enumerate(contracts_list):
@@ -46,7 +48,8 @@ def deploy_menu(web3):
 	"""
 	print(menu)
 	while True:	
-		index = int(input('Press 1 to show the Menu, press 0 to quit this contract menu and return to main menu.\n'))
+		print('[bold green]Press 1 to show the Menu, press 0 to quit this contract menu and return to main menu.[/bold green]')
+		index = int(input())
 		if index == 0:
 			break
 		if index == 1:
@@ -74,12 +77,12 @@ def deploy_menu(web3):
 			print(contract.functions.greet().call())
 		if index == 7:
 			contract = select_contract()
+			# using first account from the blockchain to create
 			web3.eth.defaultAccount = web3.eth.accounts[0]
 			string = input('Type the new greeting \n')
 			# the tx_hash is instant but we need to wait for the transaction to be mined and confirmed
 			tx_hash = contract.functions.setGreeting(string).transact()
 			print('Waiting for transaction receipt.')
 			web3.eth.waitForTransactionReceipt(tx_hash)
-			print(f'Transaction Result:\n')
-			dictionary = dict(web3.eth.get_transaction(tx_hash))
-			pprint.pprint(dictionary)
+			print(f'Transaction Result:\n')			
+			print_json(attributedict_to_json(web3.eth.get_transaction(tx_hash)))

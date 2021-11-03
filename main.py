@@ -2,6 +2,10 @@ from web3 import Web3
 import transaction
 import blocks
 import smart_contracts
+from rich import print
+from rich.console import Console
+from rich.markdown import Markdown
+
 ganache_url = "http://127.0.0.1:8545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
 menu = """
@@ -17,13 +21,15 @@ menu = """
 7. Convert Wei to ETH.
 8. Convert ETH to Wei.
 9. Smart Contracts Operations.
+10. Print README.md.
 
 0. Quit.
 ####################################################
 """
 print(menu)
-while True:	
-	index = int(input('Press 1 to show the Menu, press 0 to quit.\n'))
+while True:
+	print('[bold red]Press 1 to show the Menu, press 0 to quit.[/bold red]')
+	index = int(input())
 	if index == 0:
 		break
 	if index == 1:
@@ -34,7 +40,7 @@ while True:
 		try:
 			transaction.makeTransaction(web3)
 		except Exception as e:
-			print(f'Something unexpected occured in this menu - {e}')
+			print(f'[yellow]Something unexpected occured in this menu - {e}')
 	if index == 4:
 		blocks.lookUpBlock(web3)
 	# iterate through blockchain blocks and print out the transactions hashes
@@ -54,4 +60,11 @@ while True:
 		try:
 			smart_contracts.deploy_menu(web3)
 		except Exception as e:
-			print(f'Something unexpected occured in this menu - {e}')
+			print(f'[yellow]Something unexpected occured in this menu - {e}')
+	# use rich library to print the README.md file
+	if index == 10:
+		console = Console()
+		with open('README.md','r') as file:
+			data = file.read()
+			md = Markdown(data)
+			console.print(md)

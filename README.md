@@ -99,8 +99,13 @@ Extract only this, this is the 1-line ABI:
 
 Alternatively, you can just copy the ABI and format it to 1-line before pasting in the terminal.
 
+### ETH Blocks
+
+Blockchain is made of transactions, they are like records. All the transactions are grouped into blocks that are chained together, each block has a number.
+
 ### Python Requirements
 
 ```sh
 pip3 install web3
+pip3 install rich
 ```

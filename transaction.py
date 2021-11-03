@@ -1,15 +1,16 @@
 from web3 import Web3
-import pprint
 from decimal import Decimal
+from modules.parse import attributedict_to_json
+from rich import print_json
+from rich import print
 def list_transactions(web3_rpc_object):
 	latest_block = web3_rpc_object.eth.block_number
 	for i in range(latest_block+1):
 		transactions_list = web3_rpc_object.eth.get_block(i).transactions
 		for transaction in transactions_list:
 			print(transaction.hex())
-def lookup_transaction(web3_rpc_object, tx_hash):	
-	dictionary = dict(web3_rpc_object.eth.get_transaction(tx_hash))
-	pprint.pprint(dictionary)
+def lookup_transaction(web3_rpc_object, tx_hash):
+	print_json(attributedict_to_json(web3_rpc_object.eth.get_transaction(tx_hash)))
 def checkBalance(web3_rpc_object):
 	print("--- These are the accounts listed in the Blockchain and their Balance ---")
 	accounts = web3_rpc_object.eth.accounts
@@ -52,6 +53,5 @@ def makeTransaction(web3_rpc_object):
 		tx_hash = web3_rpc_object.eth.send_raw_transaction(signed_tx.rawTransaction)
 		print('Waiting for transaction receipt.')
 		web3_rpc_object.eth.waitForTransactionReceipt(tx_hash)
-		print('-- Transaction Result --')
-		dictionary = dict(web3_rpc_object.eth.get_transaction(tx_hash))
-		pprint.pprint(dictionary)
+		print('-- Transaction Result --')		
+		print_json(attributedict_to_json(web3_rpc_object.eth.get_transaction(tx_hash)))
