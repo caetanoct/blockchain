@@ -101,7 +101,9 @@ Alternatively, you can just copy the ABI and format it to 1-line before pasting 
 
 ### ETH Blocks
 
-Blockchain is made of transactions, they are like records. All the transactions are grouped into blocks that are chained together, each block has a number.
+The blockchain is made of transactions, they are like records. All the transactions are grouped into blocks that are chained together, each block has it's own number.
+
+The application can be used on the real ethereum blockchain instead of the private ganache development network, but it's not recommended.
 
 ### Python Requirements
 

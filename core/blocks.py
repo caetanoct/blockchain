@@ -5,6 +5,8 @@ from modules.parse import attributedict_to_json
 from rich import print_json
 from rich import print
 clear = lambda: os.system('clear')
+# let the user choose if he wants to show information on all blocks or just a specific block
+# prints the web3.py API return of the getblock function that gives us a bunch of information on the block
 def lookUpBlock(web3_rpc_object):
 	latest_block = web3_rpc_object.eth.block_number
 	clear()

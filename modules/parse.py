@@ -1,5 +1,6 @@
 import json
 from hexbytes import HexBytes
+from web3.datastructures import AttributeDict
 '''
     result = {}
     for key, val in tx.items():
@@ -16,4 +17,6 @@ class HexJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, HexBytes):
             return obj.hex()
+        if isinstance(obj, AttributeDict):
+            return dict(obj)
         return super().default(obj)
