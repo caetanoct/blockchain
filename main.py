@@ -1,7 +1,7 @@
 from web3 import Web3
-import transaction
-import blocks
-import smart_contracts
+from core import transaction as transaction
+from core import blocks as blocks
+from core import smart_contracts as smart_contracts
 from rich import print
 from rich.console import Console
 from rich.markdown import Markdown
@@ -51,10 +51,12 @@ while True:
 		transaction.lookup_transaction(web3, tx_hash)
 	if index == 7:
 		wei = input('Type value in Wei:\n')
-		print(web3.fromWei(int(wei), 'ether'))
+		result = web3.fromWei(int(wei), 'ether')
+		print(f'Result:\n{result} ETH')
 	if index == 8:
 		eth = input('Type value in ETH:\n')
-		print(web3.toWei(eth, 'ether'))
+		result = web3.toWei(eth, 'ether')
+		print(f'Result:\n{result} Wei')
 	# instead os setting up a truffle project and create smart contracts, in this program we will use remix to ilustrate
 	if index == 9:
 		try:
