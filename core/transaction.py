@@ -8,9 +8,14 @@ def list_transactions(web3_rpc_object):
 	for i in range(latest_block+1):
 		transactions_list = web3_rpc_object.eth.get_block(i).transactions
 		for transaction in transactions_list:
-			print(transaction.hex())
+			tx_hash = transaction.hex()
+			to,source = get_to_and_from(web3_rpc_object,transaction)
+			print(f'[green bold]{tx_hash}[/green bold]\n\tfrom {source}\n\tto {to}')
 def lookup_transaction(web3_rpc_object, tx_hash):
 	print_json(attributedict_to_json(web3_rpc_object.eth.get_transaction(tx_hash)))
+def get_to_and_from(web3_rpc_object, tx_hash):
+	tx_attribute_dict = web3_rpc_object.eth.get_transaction(tx_hash)
+	return (tx_attribute_dict.to,tx_attribute_dict['from'])	
 def checkBalance(web3_rpc_object):
 	print("--- These are the accounts listed in the Blockchain and their Balance ---")
 	accounts = web3_rpc_object.eth.accounts
@@ -55,3 +60,16 @@ def makeTransaction(web3_rpc_object):
 		web3_rpc_object.eth.waitForTransactionReceipt(tx_hash)
 		print('-- Transaction Result --')		
 		print_json(attributedict_to_json(web3_rpc_object.eth.get_transaction(tx_hash)))
+if __name__ == '__main__':
+	import json
+	def attributedict_to_json(tx):	
+		txdict = dict(tx)
+		return json.dumps(txdict, cls=HexJsonEncoder)
+	class HexJsonEncoder(json.JSONEncoder):
+		def default(self, obj):
+			if isinstance(obj, HexBytes):
+				return obj.hex()
+			return super().default(obj)
+	ganache_url = "http://127.0.0.1:8545"
+	web3 = Web3(Web3.HTTPProvider(ganache_url))
+	list_transactions(web3)
