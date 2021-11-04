@@ -107,12 +107,47 @@ The application can be used on the real ethereum blockchain instead of the priva
 
 ### Python Requirements
 
+For running the program you need:
 ```sh
 pip3 install web3
 pip3 install rich
 ```
+To be able to compile .sol and deploy contracts without using Remix you need to install:
+```sh
+pip3 install -U "web3[tester]"
+pip3 install py-solc-x
+```
+after `py-solc-x` is installed we need to install a version of `solc` in the python interpreter:
+1. Type `python3`.
+2. On the python interpreter type:
+```py
+from solcx import install_solc
+install_solc(version='latest')
+```
+
+### Contracts in directory core/contracts
+
+In this directory, we can find a bunch of smart contracts that can be compiled and deployed on the Blockchain by the script. Most of them were extracted from this [website](https://solidity-by-example.org/).
+
+### Gas
+
+How much ether do you need to pay for a transaction?
+You pay gas spent * gas price amount of ether, where
+* gas is a unit of computation
+* gas spent is the total amount of gas used in a transaction
+* gas price is how much ether you are willing to pay per gas
+
+Transactions with higher gas price have higher priority to be included in a block.
+Unspent gas will be refunded.
+
+Gas Limit
+There are 2 upper bounds to the amount of gas you can spend
+* gas limit (max amount of gas you're willing to use for your transaction, set by you)
+* block gas limit (max amount of gas allowed in a block, set by the network)
 
 ### Documentation Links
 
 [web3](https://web3py.readthedocs.io/)
 [rich](https://rich.readthedocs.io/)
+[solidity-by-example](https://solidity-by-example.org/)
+[ERC20](https://solidity-by-example.org/app/erc20/)

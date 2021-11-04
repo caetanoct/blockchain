@@ -1,7 +1,8 @@
 import json
 from web3 import Web3
-from modules.parse import attributedict_to_json
-from core.transaction import fetch_all_receipts
+if __name__ != '__main__':
+	from modules.parse import attributedict_to_json
+	from core.transaction import fetch_all_receipts
 from rich import print_json
 from rich import print
 
@@ -63,11 +64,12 @@ def deploy_menu(web3):
 ###################################################
 1. Show Menu.
 2. Add a Existing Contract to the List
-3. Print Contracts List
-4. Select and Print Contract ABI
-5. Select and Print Contract ABI names
-6. Call greet()
-7. Call setGreeting()
+3. Compile and Deploy a Contract
+4. Print Contracts List
+5. Select and Print Contract ABI
+6. Select and Print Contract ABI names
+7. Call greet()
+8. Call setGreeting()
 
 0. Quit.
 ###################################################
@@ -95,17 +97,20 @@ def deploy_menu(web3):
 			print(f'Contract added - {contract}')			
 			#contract = web3.eth.contract(address=web3.toChecksumAddress("0x6f03A8Fc467c9455DE2D7fC5bbE3DF839db69d61"),abi=json.loads('[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"greet","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"greeting","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_greeting","type":"string"}],"name":"setGreeting","outputs":[],"stateMutability":"nonpayable","type":"function"}]'))			
 		if index == 3:
-			print_contract_list()
+			path = select_source_code()
+			compile_and_deploy_contract(path,web3)
 		if index == 4:
-			contract = select_contract()
-			print_contract_abi(contract)
+			print_contract_list()
 		if index == 5:
 			contract = select_contract()
-			print_contract_abi_names(contract)
+			print_contract_abi(contract)
 		if index == 6:
 			contract = select_contract()
-			print(contract.functions.greet().call())
+			print_contract_abi_names(contract)
 		if index == 7:
+			contract = select_contract()
+			print(contract.functions.greet().call())
+		if index == 8:
 			contract = select_contract()
 			# using first account from the blockchain to create
 			web3.eth.defaultAccount = web3.eth.accounts[0]
@@ -116,6 +121,41 @@ def deploy_menu(web3):
 			web3.eth.waitForTransactionReceipt(tx_hash)
 			print(f'Transaction Result:\n')			
 			print_json(attributedict_to_json(web3.eth.get_transaction(tx_hash)))		
+# let the user choose which contract he wants to compile and return it's path
+def select_source_code():
+	# list the sorce codes
+	import os
+	list_of_contents = os.listdir("./core/contracts")
+	print('--- [bold green].sol[/bold green] files in contracts directory ---')
+	for i,file in enumerate(list_of_contents):
+		print(f'{i} - {file}')
+	print('Select contract by index')
+	index = int(input())
+	selected_contract_path = "./core/contracts/"+list_of_contents[index]
+	print(f'Selected contract is: {selected_contract_path}')
+	return selected_contract_path
+# compile and deploy the contract on the blockchain
+def compile_and_deploy_contract(path,web3):
+	with open(path,'r') as file:
+		sol_source_code = file.read()
+		from solcx import compile_source
+		compiled_sol = compile_source(sol_source_code)
+		# retrieve the contract interface
+		contract_id, contract_interface = compiled_sol.popitem()
+		# get bytecode / bin
+		bytecode = contract_interface['bin']
+		# get abi
+		abi = contract_interface['abi']
+		# set pre-funded account as sender
+		web3.eth.default_account = web3.eth.accounts[0]
+		Contract = web3.eth.contract(abi=abi, bytecode=bytecode)
+		# Submit the transaction that deploys the contract
+		tx_hash = Contract.constructor().transact()
+		# Wait for the transaction to be mined, and get the transaction receipt
+		tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+		print(f'Contract added:\n\tcontract address: {tx_receipt.contractAddress}\n\thash: {tx_hash.hex()}')
+		# adds the contract to contract list
+		contracts_list.append(web3.eth.contract(address=tx_receipt.contractAddress, abi=abi))
 if __name__ == '__main__':
 	ganache_url = "http://127.0.0.1:8545"
 	web3 = Web3(Web3.HTTPProvider(ganache_url))
@@ -129,5 +169,5 @@ if __name__ == '__main__':
 			if isinstance(obj, HexBytes):
 				return obj.hex()
 			return super().default(obj)
-	fetch_blockchain_contract_addresses(web3)
+	#fetch_blockchain_contract_addresses(web3)
 	deploy_menu(web3)
